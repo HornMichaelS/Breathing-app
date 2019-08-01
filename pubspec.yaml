@@ -25,13 +25,13 @@ dependencies:
   cupertino_icons: ^0.1.2
 
   provider: ^3.0.0+1
-  slide_countdown_clock:
-    path: /Volumes/Michael_Backup/miscBackup/AndroidStudioProjects/slide_countdown_clock
-#  slide_countdown_clock: ^1.0.3
 #  slide_countdown_clock:
-#    git:
-#      url: https://github.com/HornMichaelS/slide_countdown_clock.git
-#      ref: add-shouldShowHours
+#    path: /Volumes/Michael_Backup/miscBackup/AndroidStudioProjects/slide_countdown_clock
+#  slide_countdown_clock: ^1.0.3
+  slide_countdown_clock:
+    git:
+      url: https://github.com/HornMichaelS/slide_countdown_clock.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

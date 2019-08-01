@@ -96,9 +96,11 @@ packages:
   slide_countdown_clock:
     dependency: "direct main"
     description:
-      path: "/Volumes/Michael_Backup/miscBackup/AndroidStudioProjects/slide_countdown_clock"
-      relative: false
-    source: path
+      path: "."
+      ref: master
+      resolved-ref: a3d8daab1aacd12fd2838efc40eddb734efaceb0
+      url: "https://github.com/HornMichaelS/slide_countdown_clock.git"
+    source: git
     version: "1.0.2"
   source_span:
     dependency: transitive
