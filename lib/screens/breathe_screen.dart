@@ -28,6 +28,9 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
       appBar: AppBar(
         brightness: Brightness.light,
         backgroundColor: Colors.white,
+        iconTheme: IconThemeData(
+          color: Colors.lightBlueAccent,
+        ),
         title: Text(
           'BREATHE',
           style: TextStyle(
