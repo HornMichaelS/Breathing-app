@@ -5,16 +5,14 @@ import 'package:focus/utilities/breathing_animation.dart';
 import 'package:focus/state/settings.dart';
 
 class BreathingCircleController extends ValueNotifier<bool> {
-  BreathingCircleController({bool animationShouldRun}) : super(animationShouldRun ?? true);
+  BreathingCircleController({bool animationShouldRun}) : super(animationShouldRun ?? false);
 
   void stopAnimation() {
     this.value = false;
-    notifyListeners();
   }
 
   void startAnimation() {
     this.value = true;
-    notifyListeners();
   }
 }
 
