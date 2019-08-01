@@ -19,6 +19,7 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
   int roundsElapsed = 0;
 
   bool showTimer = false;
+  DateTime startTime;
 
   BreathingCircleController breathingCircleController = BreathingCircleController();
 
@@ -65,16 +66,17 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
                     width: double.infinity,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
-                      child: Slider(
-                        value: Provider.of<Settings>(context).speed.toDouble(),
-                        onChanged: (value) {
-                          Settings settings = Provider.of<Settings>(context);
-                          if (value.floor() != settings.speed) {
-                            settings.speed = value.floor();
-                          }
-                        },
-                        min: 1,
-                        max: 9,
+                      child: Consumer<Settings>(
+                        builder: (context, settings, child) => Slider(
+                          value: settings.speed.toDouble(),
+                          onChanged: (value) {
+                            if (value.floor() != settings.speed) {
+                              settings.speed = value.floor();
+                            }
+                          },
+                          min: 1,
+                          max: 9,
+                        ),
                       ),
                     ),
                   ),
@@ -87,44 +89,47 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
     );
   }
 
-  BreathingCircle _buildBreathingCircle() {
-    return BreathingCircle(
-      controller: breathingCircleController,
-      didCompleteCycle: () {
-        Settings settings = Provider.of<Settings>(context);
+  Widget _buildBreathingCircle() {
+    return Consumer<Settings>(
+      builder: (context, settings, child) => BreathingCircle(
+        controller: breathingCircleController,
+        didCompleteCycle: () {
+          if (count + 1 == settings.breathsPerRound) {
+            breathingCircleController.stopAnimation();
 
-        if (count + 1 == settings.breathsPerRound) {
-          breathingCircleController.stopAnimation();
-
-          setState(() {
-            count++;
-          });
-
-          Future.delayed(Duration(milliseconds: 1)).then((_) {
             setState(() {
-              if (mounted) {
-                showTimer = true;
-              }
+              count++;
             });
-          });
-        } else {
-          setState(() {
-            count++;
-          });
-        }
-      },
-      child: Text(
-        count.toString(),
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 60,
-          fontWeight: FontWeight.w100,
+
+            Future.delayed(Duration(milliseconds: 1)).then((_) {
+              setState(() {
+                if (mounted) {
+                  showTimer = true;
+                  startTime = DateTime.now();
+                }
+              });
+            });
+          } else {
+            setState(() {
+              count++;
+            });
+          }
+        },
+        child: Text(
+          count.toString(),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 60,
+            fontWeight: FontWeight.w100,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTimerWidget() {
+    Settings settings = Provider.of<Settings>(context, listen: false);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -136,9 +141,9 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
           ),
           shouldShowHours: false,
           separator: ':',
-          duration: Duration(seconds: Provider.of<Settings>(context).holdTime),
+          duration: Duration(seconds: settings.holdTime),
           onDone: () {
-            int numRounds = Provider.of<Settings>(context).numRounds;
+            int numRounds = settings.numRounds;
             roundsElapsed++;
             setState(() {
               if (roundsElapsed == numRounds) {
@@ -146,6 +151,7 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
               }
               count = 0;
               showTimer = false;
+              startTime = null;
             });
 
             if (roundsElapsed == numRounds) {
