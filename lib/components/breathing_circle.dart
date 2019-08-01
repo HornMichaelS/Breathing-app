@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:focus/components/round_container.dart';
+import 'package:focus/utilities/breathing_animation.dart';
+import 'package:focus/state/settings.dart';
+
+class BreathingCircleController extends ValueNotifier<bool> {
+  BreathingCircleController({bool animationShouldRun}) : super(animationShouldRun ?? true);
+
+  void stopAnimation() {
+    this.value = false;
+    notifyListeners();
+  }
+
+  void startAnimation() {
+    this.value = true;
+    notifyListeners();
+  }
+}
+
+class BreathingCircle extends StatefulWidget {
+  BreathingCircle({
+    this.didCompleteCycle,
+    this.child,
+    BreathingCircleController controller,
+  }) : _controller = controller;
+
+  final Function didCompleteCycle;
+  final Widget child;
+  final BreathingCircleController _controller;
+
+  @override
+  _BreathingCircleState createState() => _BreathingCircleState();
+}
+
+class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProviderStateMixin {
+  static const double _baseRadius = 80;
+
+  double circleRadius = _baseRadius;
+
+  BreathingAnimation breathingAnimation;
+
+  BreathingCircleController controller;
+  Function listener;
+
+  Settings settings;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    controller = widget._controller ?? BreathingCircleController();
+
+    listener = () {
+      print('Listened');
+      if (controller.value) {
+        breathingAnimation.start();
+      } else {
+        breathingAnimation.stop();
+      }
+    };
+
+    print('Adding listener...');
+    controller.addListener(listener);
+  }
+
+  @override
+  void didChangeDependencies() {
+    print(controller);
+    super.didChangeDependencies();
+
+    settings = Provider.of<Settings>(context);
+
+    if (breathingAnimation == null) {
+      breathingAnimation = BreathingAnimation(
+        vsync: this,
+        initialSpeed: settings.speed,
+        min: _baseRadius,
+        max: _baseRadius * 1.5,
+        didCompleteOutBreath: widget.didCompleteCycle,
+      );
+
+      breathingAnimation.addListener(() {
+        setState(() {
+          circleRadius = breathingAnimation.value;
+        });
+      });
+
+      print('Start animation?');
+      controller.startAnimation();
+    } else {
+      breathingAnimation.updateSpeed(settings.speed);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RoundContainer(
+      radius: circleRadius,
+      color: Colors.lightBlueAccent[200],
+      child: Center(
+        child: widget.child,
+      ),
+    );
+  }
+
+  @override
+  void deactivate() {
+    // TODO: implement deactivate
+    super.deactivate();
+    print('deactivated');
+  }
+
+  @override
+  void dispose() {
+    print('dispose');
+    breathingAnimation.dispose();
+    print('Removing listener');
+    controller?.removeListener(listener);
+    super.dispose();
+  }
+}
