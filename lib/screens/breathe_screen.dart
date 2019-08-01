@@ -65,7 +65,6 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
                       child: Slider(
                         value: Provider.of<Settings>(context).speed.toDouble(),
                         onChanged: (value) {
-                          print('onChanged: $value');
                           Settings settings = Provider.of<Settings>(context);
                           if (value.floor() != settings.speed) {
                             settings.speed = value.floor();
@@ -136,7 +135,6 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
           separator: ':',
           duration: Duration(seconds: Provider.of<Settings>(context).holdTime),
           onDone: () {
-            print('Timer done!');
             int numRounds = Provider.of<Settings>(context).numRounds;
             roundsElapsed++;
             setState(() {

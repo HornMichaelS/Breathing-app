@@ -51,7 +51,6 @@ class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProv
     controller = widget._controller ?? BreathingCircleController();
 
     listener = () {
-      print('Listened');
       if (controller.value) {
         breathingAnimation.start();
       } else {
@@ -59,7 +58,6 @@ class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProv
       }
     };
 
-    print('Adding listener...');
     controller.addListener(listener);
   }
 
@@ -85,7 +83,6 @@ class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProv
         });
       });
 
-      print('Start animation?');
       controller.startAnimation();
     } else {
       breathingAnimation.updateSpeed(settings.speed);
@@ -104,17 +101,8 @@ class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProv
   }
 
   @override
-  void deactivate() {
-    // TODO: implement deactivate
-    super.deactivate();
-    print('deactivated');
-  }
-
-  @override
   void dispose() {
-    print('dispose');
     breathingAnimation.dispose();
-    print('Removing listener');
     controller?.removeListener(listener);
     super.dispose();
   }
