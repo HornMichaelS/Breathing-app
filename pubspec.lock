@@ -98,7 +98,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: a3d8daab1aacd12fd2838efc40eddb734efaceb0
+      resolved-ref: "83dd1301d38b214034a5ebd7c9de71423527baff"
       url: "https://github.com/HornMichaelS/slide_countdown_clock.git"
     source: git
     version: "1.0.2"

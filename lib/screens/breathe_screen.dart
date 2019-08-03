@@ -7,6 +7,13 @@ import 'package:focus/utilities/breathing_animation.dart';
 import 'package:focus/components/breathing_circle.dart';
 import 'package:focus/state/settings.dart';
 
+enum CentralWidget {
+  breathingCircle,
+  breatheInText,
+  holdTimer1,
+  holdTimer2,
+}
+
 class BreatheScreen extends StatefulWidget {
   static const String id = 'BreatheScreen';
 
@@ -18,10 +25,60 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
   int count = 0;
   int roundsElapsed = 0;
 
-  bool showTimer = false;
+  CentralWidget centralWidget = CentralWidget.breathingCircle;
   DateTime startTime;
 
   BreathingCircleController breathingCircleController = BreathingCircleController();
+
+  Widget getCentralWidget() {
+    Settings settings = Provider.of<Settings>(context, listen: false);
+    switch (centralWidget) {
+      case CentralWidget.breathingCircle:
+        return _buildBreathingCircle();
+        break;
+      case CentralWidget.breatheInText:
+        return Text(
+          'Breathe In!',
+          style: TextStyle(
+            fontSize: 30,
+          ),
+        );
+        break;
+      case CentralWidget.holdTimer1:
+        return _buildTimerWidget(settings.holdTime, () {
+          setState(() {
+            centralWidget = CentralWidget.breatheInText;
+          });
+
+          Future.delayed(Duration(milliseconds: 2500)).then((_) {
+            setState(() {
+              centralWidget = CentralWidget.holdTimer2;
+            });
+          });
+        });
+        break;
+      case CentralWidget.holdTimer2:
+        return _buildTimerWidget(10, () {
+          int numRounds = settings.numRounds;
+          roundsElapsed++;
+
+          setState(() {
+            if (roundsElapsed == numRounds) {
+              return;
+            }
+            count = 0;
+            centralWidget = CentralWidget.breathingCircle;
+            startTime = null;
+          });
+
+          if (roundsElapsed == numRounds) {
+            Navigator.pop(context);
+            return;
+          }
+        });
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +108,8 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
             Expanded(
               child: Center(
                 child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 1000),
-                  child: showTimer ? _buildTimerWidget() : _buildBreathingCircle(),
+                  duration: Duration(milliseconds: 500),
+                  child: getCentralWidget(),
                 ),
               ),
             ),
@@ -104,7 +161,7 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
             Future.delayed(Duration(milliseconds: 1)).then((_) {
               setState(() {
                 if (mounted) {
-                  showTimer = true;
+                  centralWidget = CentralWidget.holdTimer1;
                   startTime = DateTime.now();
                 }
               });
@@ -127,9 +184,7 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildTimerWidget() {
-    Settings settings = Provider.of<Settings>(context, listen: false);
-
+  Widget _buildTimerWidget(int holdTime, Function onDone) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -141,24 +196,8 @@ class _BreatheScreenState extends State<BreatheScreen> with SingleTickerProvider
           ),
           shouldShowHours: false,
           separator: ':',
-          duration: Duration(seconds: settings.holdTime),
-          onDone: () {
-            int numRounds = settings.numRounds;
-            roundsElapsed++;
-            setState(() {
-              if (roundsElapsed == numRounds) {
-                return;
-              }
-              count = 0;
-              showTimer = false;
-              startTime = null;
-            });
-
-            if (roundsElapsed == numRounds) {
-              Navigator.pop(context);
-              return;
-            }
-          },
+          duration: Duration(seconds: holdTime),
+          onDone: onDone,
         ),
       ],
     );
