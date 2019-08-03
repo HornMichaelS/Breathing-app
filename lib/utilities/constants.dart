@@ -18,4 +18,8 @@ TextStyle kTitleTextStyle = TextStyle(
   color: Colors.black,
 );
 
+TextStyle kBreathingTextStyle = TextStyle(
+  fontSize: 20,
+);
+
 double kSettingsButtonIconSize = 30.0;

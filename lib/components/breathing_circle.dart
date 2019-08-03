@@ -103,6 +103,7 @@ class _BreathingCircleState extends State<BreathingCircle> with SingleTickerProv
   @override
   void dispose() {
     breathingAnimation.dispose();
+    controller?.stopAnimation();
     controller?.removeListener(listener);
     super.dispose();
   }
